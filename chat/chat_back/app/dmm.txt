@@ -1,0 +1,507 @@
+# app/chat.py
+"""
+get_current_user
+Router REST + WebSocket endpoint for Chat.
+- REST: minimal endpoints to create conversation, list conversations, get messages, post message (fallback)
+- WebSocket: token auth via query param or header, ConnectionManager for broadcasting
+- Uses db.get_async_session for persistence
+"""
+auth
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Dict, List
+import json
+import logging
+import os
+from datetime import datetime
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, insert
+from app.db import get_async_session, User, Conversation, Participant, Message  # models + dependency
+
+# simple jwt (python-jose)
+from jose import JWTError, jwt
+
+logger = logging.getLogger("chat")
+
+router = APIRouter()
+security = HTTPBearer()
+
+SECRET_KEY = os.getenv("SECRET_KEY", "changeme")
+ALGORITHM = "HS256"
+
+# --------------------------
+# JWT helpers
+# --------------------------
+def decode_jwt_token(token: str) -> dict:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError as e:
+        raise HTTPException(status_code=401, detail="Token invalide")
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: AsyncSession = Depends(get_async_session)):
+    token = credentials.credentials
+    payload = decode_jwt_token(token)
+    user_id = payload.get("sub") or payload.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Token invalide")
+    # optional: load user from DB to ensure exists
+    result = await db.execute(select(User).filter(User.id == int(user_id)))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Utilisateur introuvable")
+    return user
+
+# --------------------------
+# ConnectionManager
+# --------------------------
+class ConnectionManager:
+    def __init__(self):
+        # map conversation_id -> list[WebSocket]
+        self.active: Dict[int, List[WebSocket]] = {}
+
+    async def connect(self, conversation_id: int, websocket: WebSocket):
+        await websocket.accept()
+        self.active.setdefault(conversation_id, []).append(websocket)
+        logger.info(f"WebSocket connected to conv {conversation_id}, total={len(self.active[conversation_id])}")
+
+    def disconnect(self, conversation_id: int, websocket: WebSocket):
+        conns = self.active.get(conversation_id)
+        if conns and websocket in conns:
+            conns.remove(websocket)
+        logger.info(f"WebSocket disconnected from conv {conversation_id}")
+
+    async def broadcast(self, conversation_id: int, message: dict):
+        conns = self.active.get(conversation_id, [])
+        data = json.dumps(message)
+        for ws in list(conns):
+            try:
+                await ws.send_text(data)
+            except Exception:
+                logger.exception("Failed to send ws message; disconnecting socket")
+                self.disconnect(conversation_id, ws)
+
+manager = ConnectionManager()
+
+# --------------------------
+# REST endpoints (minimal)
+# --------------------------
+
+@router.get("/conversations", summary="List conversations for current user")
+async def list_conversations(current_user = Depends(get_current_user), db: AsyncSession = Depends(get_async_session)):
+    # fetch conversation ids where user is participant
+    q = select(Conversation).join(Participant, Participant.conversation_id == Conversation.id).filter(Participant.user_id == current_user.id)
+    result = await db.execute(q)
+    convs = result.scalars().all()
+    out = [{"id": c.id, "name": c.name, "is_group": c.is_group} for c in convs]
+    return out
+
+@router.post("/conversations", summary="Create a conversation (1:1 or group)")
+async def create_conversation(payload: dict, current_user = Depends(get_current_user), db: AsyncSession = Depends(get_async_session)):
+    """
+    payload example:
+    {
+      "participant_ids": [2,3],
+      "name": "Team A"   # optional => group
+    }
+    """
+    participant_ids = payload.get("participant_ids", [])
+    name = payload.get("name")
+    is_group = bool(name) or len(participant_ids) > 1
+    # create conversation
+    stmt = insert(Conversation).values(name=name, is_group=is_group, created_by=current_user.id).returning(Conversation.id)
+    res = await db.execute(stmt)
+    conv_id = res.scalar_one()
+    # add participants (including creator)
+    # use Participant model inserts
+    for uid in set(participant_ids + [current_user.id]):
+        await db.execute(insert(Participant).values(conversation_id=conv_id, user_id=uid, is_admin=(uid==current_user.id)))
+    await db.commit()
+    return {"conversation_id": conv_id, "is_group": is_group}
+
+@router.get("/conversations/{conv_id}/messages", summary="Get messages (history)")
+async def get_messages(conv_id: int, limit: int = 50, before: str = None, current_user = Depends(get_current_user), db: AsyncSession = Depends(get_async_session)):
+    # check participant
+    qp = select(Participant).filter(Participant.conversation_id == conv_id, Participant.user_id == current_user.id)
+    res = await db.execute(qp)
+    if not res.scalars().first():
+        raise HTTPException(status_code=403, detail="User not participant")
+    # fetch messages
+    q = select(Message).filter(Message.conversation_id == conv_id).order_by(Message.created_at.desc()).limit(limit)
+    result = await db.execute(q)
+    msgs = result.scalars().all()
+    out = []
+    for m in reversed(msgs):  # oldest->newest
+        out.append({
+            "id": m.id,
+            "conversation_id": m.conversation_id,
+            "sender_id": m.user_id,
+            "content": m.content,
+            "attachment_url": m.attachment_url,
+            "created_at": m.created_at.isoformat()
+        })
+    return out
+
+@router.post("/conversations/{conv_id}/messages", summary="POST fallback to send message (HTTP)")
+async def post_message(conv_id: int, payload: dict, current_user = Depends(get_current_user), db: AsyncSession = Depends(get_async_session)):
+    content = payload.get("content")
+    client_temp_id = payload.get("client_temp_id")
+    attachment_url = payload.get("attachment_url")
+    # check participant
+    qp = select(Participant).filter(Participant.conversation_id == conv_id, Participant.user_id == current_user.id)
+    res = await db.execute(qp)
+    if not res.scalars().first():
+        raise HTTPException(status_code=403, detail="User not participant")
+    # persist
+    stmt = insert(Message).values(conversation_id=conv_id, user_id=current_user.id, content=content, attachment_url=attachment_url).returning(Message.id, Message.created_at)
+    r = await db.execute(stmt)
+    await db.commit()
+    mid, created_at = r.fetchone()
+    ack = {"type":"ack", "client_temp_id": client_temp_id, "message_id": mid, "created_at": created_at.isoformat()}
+    # broadcast to connected sockets
+    await manager.broadcast(conv_id, {"type":"message", "message": {"id": mid, "conversation_id": conv_id, "sender_id": current_user.id, "content": content, "attachment_url": attachment_url, "created_at": created_at.isoformat()}})
+    return ack
+
+# --------------------------
+# WebSocket endpoint
+# --------------------------
+@router.websocket("/ws/chat/{conversation_id}")
+async def websocket_endpoint(websocket: WebSocket, conversation_id: int):
+    """
+    WebSocket handshake expects token either in query param '?token=...' or 'Authorization: Bearer ...' header.
+    Example connection:
+      ws://localhost:8000/ws/chat/42?token=<JWT>
+    """
+    # extract token (query param)
+    token = websocket.query_params.get("token")
+    if not token:
+        # try header
+        hdr = dict(websocket.headers).get("authorization")
+        if hdr and hdr.startswith("Bearer "):
+            token = hdr.split(" ", 1)[1]
+    if not token:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
+    # decode token
+    try:
+        payload = decode_jwt_token(token)
+        user_id = payload.get("sub") or payload.get("user_id")
+        if not user_id:
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+    except HTTPException:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
+    # accept connection and add to manager
+    await manager.connect(conversation_id, websocket)
+
+    try:
+        while True:
+            raw = await websocket.receive_text()
+            data = json.loads(raw)
+            # expected: {"type":"send_message", "content":"...", "client_temp_id":"tmp-1", "attachment_url": null}
+            if data.get("type") == "send_message":
+                content = data.get("content")
+                client_temp_id = data.get("client_temp_id")
+                attachment_url = data.get("attachment_url")
+                # Persist to DB (open a session)
+                async with AsyncSessionLocal() as session:
+                    # verify participant (quick check)
+                    qp = select(Participant).filter(Participant.conversation_id == conversation_id, Participant.user_id == int(user_id))
+                    pr = await session.execute(qp)
+                    if not pr.scalars().first():
+                        # user not participant
+                        await websocket.send_text(json.dumps({"type":"error","message":"forbidden"}))
+                        continue
+                    stmt = insert(Message).values(conversation_id=conversation_id, user_id=int(user_id), content=content, attachment_url=attachment_url).returning(Message.id, Message.created_at)
+                    r = await session.execute(stmt)
+                    await session.commit()
+                    mid, created_at = r.fetchone()
+                # send ack to sender (only)
+                ack = {"type":"ack","client_temp_id":client_temp_id,"message_id": mid, "created_at": created_at.isoformat()}
+                await websocket.send_text(json.dumps(ack))
+                # broadcast to room
+                await manager.broadcast(conversation_id, {"type":"message","message":{"id": mid,"conversation_id": conversation_id,"sender_id": int(user_id),"content": content,"attachment_url": attachment_url,"created_at": created_at.isoformat()}})
+            else:
+                # support typing/read events in future
+                pass
+
+    except WebSocketDisconnect:
+        manager.disconnect(conversation_id, websocket)
+# app/main.py
+"""
+Point d'entrée du service Chat (FastAPI).
+- charge .env
+- inclut le router chat (/api/chat)
+- déclare websocket endpoint (défini dans app/chat.py)
+- startup/shutdown : initialise/ferme la DB (async)
+"""
+
+import os
+import logging
+from dotenv import load_dotenv
+from fastapi import FastAPI
+
+# charger .env (dev)
+load_dotenv()
+
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+logging.basicConfig(level=LOG_LEVEL)
+logger = logging.getLogger("chat.main")
+
+# importer router et websocket endpoint
+from app.chat import router as chat_router, websocket_endpoint  # noqa: E402
+
+# importer init/close db
+from app.db import init_db, close_db  # noqa: E402
+
+def create_app() -> FastAPI:
+    app = FastAPI(title=os.getenv("APP_TITLE", "Chat Service"), version="0.1.0")
+
+    # inclure le router REST du chat sous /api/chat
+    app.include_router(chat_router, prefix="/api/chat")
+
+    # monter le websocket endpoint (chemin global)
+    # Note: FastAPI websocket decorator used this way to attach function defined elsewhere
+    app.websocket("/ws/chat/{conversation_id}")(websocket_endpoint)
+
+    # health endpoint léger
+    @app.get("/health", tags=["health"])
+    async def health():
+        return {"status": "ok"}
+
+    # startup/shutdown
+    @app.on_event("startup")
+    async def on_startup():
+        logger.info("Starting Chat Service...")
+        # initialise la DB (crée les tables si nécessaire)
+        await init_db()
+        logger.info("Startup complete.")
+
+    @app.on_event("shutdown")
+    async def on_shutdown():
+        
+        logger.info("Shutting down Chat Service...")
+        await close_db()
+        logger.info("Shutdown complete.")
+
+    return app
+
+app = create_app()
+# app/db.py
+"""
+DB async setup + modèles SQLAlchemy (minimal) + helpers.
+- create_async_engine + AsyncSessionLocal
+- Base metadata with simple models: User, Conversation, Participant, Message
+- init_db() to create tables (async)
+- close_db() to dispose engine
+- dependency get_async_session() for injection
+"""
+
+import os
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Text, DateTime, Index
+from datetime import datetime
+import asyncio
+
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/chatdb")
+# Example: postgresql+asyncpg://user:pass@localhost:5432/dbname
+
+# SQLAlchemy async engine & session
+engine = create_async_engine(DATABASE_URL, future=True, echo=False)
+AsyncSessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+
+Base = declarative_base()
+
+# ------------------------
+# Models (minimal, extensible)
+# ------------------------
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(150), unique=True, index=True, nullable=False)
+    hashed_password = Column(String(256), nullable=True)  # if you implement local auth
+    is_active = Column(Boolean, default=True)
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=True)   # group name (optional)
+    is_group = Column(Boolean, default=False)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+class Participant(Base):
+    __tablename__ = "participants"
+    id = Column(Integer, primary_key=True, index=True)
+    conversation_id = Column(Integer, ForeignKey("conversations.id"), index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    is_admin = Column(Boolean, default=False)
+    joined_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        Index("ix_part_conv_user", "conversation_id", "user_id", unique=True),
+    )
+
+class Message(Base):
+    __tablename__ = "messages"
+    id = Column(Integer, primary_key=True, index=True)
+    conversation_id = Column(Integer, ForeignKey("conversations.id"), index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content = Column(Text, nullable=True)
+    attachment_url = Column(String(500), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    # NOTE: you can add message_type, edited_at, deleted_at, embedding_id later
+
+    __table_args__ = (
+        Index("ix_messages_conv_created", "conversation_id", "created_at"),
+    )
+
+# ------------------------
+# Helpers
+# ------------------------
+async def init_db():
+    """
+    Create all tables (if they do not exist).
+    Use for development / prototype.
+    In production, use Alembic migrations instead.
+    """
+    async with engine.begin() as conn:
+        # create all tables
+        await conn.run_sync(Base.metadata.create_all)
+
+async def close_db():
+    await engine.dispose()
+
+# Dependency for routes
+async def get_async_session():
+    async with AsyncSessionLocal() as session:
+        yield session
+# app/schemas.py
+from pydantic import BaseModel
+from datetime import datetime
+from typing import Optional, List
+
+class MessageCreate(BaseModel):
+    content: str
+    attachment_url: Optional[str] = None
+
+class MessageRead(BaseModel):
+    id: int
+    conversation_id: int
+    sender_id: int
+    content: str
+    attachment_url: Optional[str]
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+class ConversationCreate(BaseModel):
+    name: Optional[str] = None
+    participant_ids: List[int]
+
+class ConversationRead(BaseModel):
+    id: int
+    name: Optional[str]
+    is_group: bool
+
+    class Config:
+        orm_mode = True
+
+class ParticipantCreate(BaseModel):
+    conversation_id: int
+    user_id: int
+    is_admin: bool = False
+#verifier les structures des donnees
+# app/models.py
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Text, DateTime
+from sqlalchemy.orm import relationship
+from datetime import datetime
+from .db import Base
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    is_active = Column(Boolean, default=True)
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=True)
+    is_group = Column(Boolean, default=False)
+    created_by = Column(Integer, ForeignKey("users.id"))
+
+class Participant(Base):
+    __tablename__ = "participants"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    conversation_id = Column(Integer, ForeignKey("conversations.id"))
+    is_admin = Column(Boolean, default=False)
+
+class Message(Base):
+    __tablename__ = "messages"
+
+    id = Column(Integer, primary_key=True)
+    conversation_id = Column(Integer, ForeignKey("conversations.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    content = Column(Text)
+    attachment_url = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+# app/utils/jwt.py
+from datetime import datetime, timedelta
+from jose import jwt, JWTError
+from fastapi import HTTPException
+import os
+
+SECRET_KEY = os.getenv("SECRET_KEY", "changeme")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+def create_access_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def decode_jwt_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token invalide")
+# app/crud.py
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, insert
+from app.models import Conversation, Participant, Message
+
+# Conversations
+async def create_conversation(db: AsyncSession, creator_id: int, participant_ids: list[int], name: str = None):
+    is_group = bool(name) or len(participant_ids) > 1
+    stmt = insert(Conversation).values(name=name, is_group=is_group, created_by=creator_id).returning(Conversation.id)
+    res = await db.execute(stmt)
+    conv_id = res.scalar_one()
+    for uid in set(participant_ids + [creator_id]):
+        await db.execute(insert(Participant).values(conversation_id=conv_id, user_id=uid, is_admin=(uid==creator_id)))
+    await db.commit()
+    return conv_id
+
+# Messages
+async def persist_message(db: AsyncSession, conv_id: int, user_id: int, content: str, attachment_url: str = None):
+    stmt = insert(Message).values(conversation_id=conv_id, user_id=user_id, content=content, attachment_url=attachment_url).returning(Message.id, Message.created_at)
+    res = await db.execute(stmt)
+    await db.commit()
+    return res.fetchone()
+
+async def get_messages_for_conv(db: AsyncSession, conv_id: int, limit: int = 50):
+    q = select(Message).filter(Message.conversation_id == conv_id).order_by(Message.created_at.desc()).limit(limit)
+    result = await db.execute(q)
+    return result.scalars().all()

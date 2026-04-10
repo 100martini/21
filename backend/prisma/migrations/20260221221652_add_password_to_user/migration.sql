@@ -1,0 +1,3 @@
+ALTER TABLE "Friendship" ALTER COLUMN "updatedAt" DROP DEFAULT;
+
+ALTER TABLE "User" ADD COLUMN     "password" TEXT;

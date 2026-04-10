@@ -1,0 +1,8 @@
+# ici va etre les listes des commandes pour installe
+# fastapi.
+brew install postgresql
+brew services start postgresql
+psql -U bimane -d postgres -h localhost
+psql -U bimane -d postgres 
+or ╰─ conda install -c conda-forge postgresql
+initdb --locale=C -E UTF-8 $(brew --prefix)/var/postgresql@17

@@ -1,0 +1,10 @@
+--> On commence par app/main.py cest le point dentree au service fastapi cest a dir de creer 
+    app fastapi , assemble les route et les conversation et configurer la cnx , gestion des events
+    et lancer le serveur
+
+--> WebSocket send → ack → broadcast → GET history
+
+-->
+-->
+-->
+-->

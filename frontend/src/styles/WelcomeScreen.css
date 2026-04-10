@@ -1,0 +1,153 @@
+:root {
+  --darkest: #1a1721;
+  --dark: #252030;
+  --medium: #352F44;
+  --accent: #5C5470;
+  --light: #B9B4C7;
+  --cream: #FAF0E6;
+}
+
+.welcome-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: #201C2A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.welcome-card {
+  background: rgba(37, 32, 48, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(185, 180, 199, 0.1);
+  border-radius: 24px;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  max-width: 500px;
+  animation: slideUp 0.8s ease-out;
+}
+
+.welcome-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid rgba(185, 180, 199, 0.2);
+  object-fit: cover;
+  margin: 0 auto 1.5rem;
+  animation: scaleIn 0.6s ease-out 0.3s both;
+}
+
+.welcome-avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid rgba(185, 180, 199, 0.2);
+  margin: 0 auto 1.5rem;
+  animation: scaleIn 0.6s ease-out 0.3s both;
+  background: linear-gradient(135deg, var(--light), var(--cream));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.welcome-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--cream);
+  margin: 0 0 1rem 0;
+  animation: fadeIn 0.8s ease-out 0.5s both;
+}
+
+.welcome-subtitle {
+  font-size: 1.1rem;
+  color: var(--light);
+  margin-bottom: 2rem;
+  animation: fadeIn 0.8s ease-out 0.7s both;
+}
+
+.welcome-level {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--light), var(--cream));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 2rem;
+  animation: fadeIn 0.8s ease-out 0.7s both;
+}
+
+.welcome-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  animation: fadeIn 0.8s ease-out 0.9s both;
+}
+
+.welcome-stat { text-align: center; }
+
+.welcome-stat-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 0.25rem;
+}
+
+.welcome-stat-label {
+  font-size: 0.75rem;
+  color: var(--light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.welcome-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(185, 180, 199, 0.2);
+}
+
+.welcome-loading {
+  width: 100%;
+  height: 4px;
+  background: rgba(185, 180, 199, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  animation: fadeIn 0.8s ease-out 1.1s both;
+}
+
+.loading-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--light), var(--cream));
+  border-radius: 2px;
+  animation: progress 4s ease-out forwards;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+@keyframes progress { from { width: 0%; } to { width: 100%; } }
+
+.welcome-screen.fade-out { animation: fadeOut 0.6s ease-out forwards; }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+@media (max-width: 640px) {
+  .welcome-card { padding: 2rem 1.5rem; margin: 1rem; }
+  .welcome-avatar { width: 100px; height: 100px; }
+  .welcome-title { font-size: 1.5rem; }
+  .welcome-level { font-size: 2rem; }
+  .welcome-stat-value { font-size: 1.25rem; }
+  .welcome-stats { gap: 1.5rem; }
+}

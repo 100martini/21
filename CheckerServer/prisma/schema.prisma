@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  createdAt DateTime @default(now())
+
+  tictactoePlayed Int @default(0)
+  tictactoeWins   Int @default(0)
+  tictactoeLosses Int @default(0)
+  tictactoeDraws  Int @default(0)
+
+  checkersPlayed  Int @default(0)
+  checkersWins    Int @default(0)
+  checkersLosses  Int @default(0)
+  checkersDraws   Int @default(0)
+}
+
+model GameHistory {
+  id        Int      @id @default(autoincrement())
+  roomId    String
+  gameType  String
+  player1   String
+  player2   String
+  winner    String   // username of winner, or "DRAW"
+  playedAt  DateTime @default(now())
+}

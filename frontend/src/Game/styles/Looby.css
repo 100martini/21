@@ -1,0 +1,592 @@
+/* Container & Layout */
+.game-lobby-wrapper .home-container {
+    min-height: 100vh;
+    background-color: #1a1625;
+    padding: 2rem;
+}
+
+.game-lobby-wrapper .home-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+.game-lobby-wrapper .home-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.game-lobby-wrapper .header-text {
+    flex: 1;
+}
+
+.game-lobby-wrapper .home-title {
+    color: #faf0e6;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.game-lobby-wrapper .home-subtitle {
+    color: #b9b4c7;
+    font-size: 0.875rem;
+}
+
+/* Status Badge */
+.game-lobby-wrapper .status-badge {
+    background-color: rgba(144, 190, 109, 0.12);
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.game-lobby-wrapper .status-indicator {
+    background-color: #90be6d;
+    border-radius: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+.game-lobby-wrapper .status-text {
+    color: #90be6d;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Games Grid */
+.game-lobby-wrapper .games-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+    .game-lobby-wrapper .games-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .game-lobby-wrapper .games-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Game Card */
+.game-lobby-wrapper .game-card-link {
+    text-decoration: none;
+    display: block;
+}
+
+.game-lobby-wrapper .game-card {
+    background-color: #252030;
+    border: 1px solid rgba(185, 180, 199, 0.08);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.game-lobby-wrapper .game-card:not(.disabled):hover {
+    border-color: rgba(185, 180, 199, 0.2);
+    transform: translateY(-2px);
+}
+
+.game-lobby-wrapper .game-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.game-lobby-wrapper .game-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+/* Game Icon */
+.game-lobby-wrapper .game-icon {
+    border-radius: 16px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+}
+
+.game-lobby-wrapper .game-icon-tictactoe {
+    background-color: rgba(185, 180, 199, 0.12);
+}
+
+.game-lobby-wrapper .game-icon-checkers {
+    background-color: rgba(239, 118, 122, 0.12);
+}
+
+.game-lobby-wrapper .game-icon-chess {
+    background-color: rgba(249, 199, 79, 0.12);
+}
+
+/* Game Badge */
+.game-lobby-wrapper .game-badge {
+    background-color: #352f44;
+    padding: 0.25rem 0.75rem;
+    border-radius: 8px;
+    color: #b9b4c7;
+    font-size: 0.6875rem;
+}
+
+/* Game Content */
+.game-lobby-wrapper .game-title {
+    color: #faf0e6;
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.game-lobby-wrapper .game-description {
+    color: #b9b4c7;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+}
+
+/* ── Bottom Row ── */
+.game-lobby-wrapper .lb-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 0;
+}
+
+/* Shared card shell */
+.game-lobby-wrapper .lb-card {
+    background-color: #252030;
+    border: 1px solid rgba(185, 180, 199, 0.08);
+    border-radius: 20px;
+    padding: 1.5rem;
+}
+
+/* Leaderboard header */
+.game-lobby-wrapper .lb-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.game-lobby-wrapper .lb-title {
+    color: #faf0e6;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.game-lobby-wrapper .lb-switch-btn {
+    background: rgba(185, 180, 199, 0.1);
+    color: #b9b4c7;
+    border: 1px solid rgba(185, 180, 199, 0.2);
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.game-lobby-wrapper .lb-switch-btn:hover {
+    background: rgba(185, 180, 199, 0.2);
+    color: #faf0e6;
+}
+
+.game-lobby-wrapper .lb-empty {
+    color: #b9b4c7;
+    font-size: 0.875rem;
+}
+
+/* Leaderboard rows */
+.game-lobby-wrapper .lb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 360px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(185, 180, 199, 0.2) transparent;
+    padding-right: 2px;
+}
+
+.game-lobby-wrapper .lb-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.game-lobby-wrapper .lb-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.game-lobby-wrapper .lb-list::-webkit-scrollbar-thumb {
+    background: rgba(185, 180, 199, 0.2);
+    border-radius: 4px;
+}
+
+.game-lobby-wrapper .lb-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+    background-color: #1e1a2e;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.game-lobby-wrapper .lb-item.lb-first {
+    background-color: rgba(249, 199, 79, 0.08);
+    border: 1px solid rgba(249, 199, 79, 0.18);
+}
+
+.game-lobby-wrapper .lb-item.lb-self {
+    background-color: rgba(185, 180, 199, 0.08);
+    border: 1px solid rgba(185, 180, 199, 0.25);
+}
+
+.game-lobby-wrapper .lb-item.lb-self .lb-name {
+    color: #b9b4c7;
+    font-weight: 700;
+}
+
+/* Current user is rank #1 */
+.game-lobby-wrapper .lb-item.lb-first.lb-self {
+    background-color: rgba(249, 199, 79, 0.06);
+    border-top: 1px solid rgba(200, 190, 120, 0.3);
+    border-bottom: 1px solid rgba(200, 190, 120, 0.3);
+    border-left: 2px solid rgba(249, 199, 79, 0.7);
+    border-right: 2px solid rgba(185, 180, 199, 0.5);
+}
+
+.game-lobby-wrapper .lb-rank {
+    color: #b9b4c7;
+    font-size: 0.75rem;
+    min-width: 1.5rem;
+}
+
+.game-lobby-wrapper .lb-first .lb-rank {
+    color: #f9c74f;
+    font-weight: 700;
+}
+
+.game-lobby-wrapper .lb-name {
+    color: #faf0e6;
+    font-weight: 500;
+    flex: 1;
+}
+
+.game-lobby-wrapper .lb-wins {
+    color: #b9b4c7;
+    font-size: 0.8rem;
+}
+
+.game-lobby-wrapper .lb-rate {
+    color: #90be6d;
+    font-weight: 600;
+    font-size: 0.875rem;
+    min-width: 2.5rem;
+    text-align: right;
+}
+
+/* Match row — Game History */
+.game-lobby-wrapper .match-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.game-lobby-wrapper .match-row:last-child {
+    border-bottom: none;
+}
+
+.game-lobby-wrapper .match-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.game-lobby-wrapper .match-game {
+    font-size: 0.8rem;
+    color: #5c5470;
+    margin-bottom: 2px;
+}
+
+.game-lobby-wrapper .match-players {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.game-lobby-wrapper .match-winner {
+    font-size: 0.8rem;
+    color: #90be6d;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.game-lobby-wrapper .match-time {
+    font-size: 0.75rem;
+    color: #5c5470;
+    margin-top: 2px;
+}
+
+/* ─── Stats View (inside lb-card) ─── */
+.game-lobby-wrapper .stats-ambient-glow {
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(144, 190, 109, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.game-lobby-wrapper .stats-pills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.game-lobby-wrapper .stats-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+.game-lobby-wrapper .stats-pill-val {
+    font-size: 1.3rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.game-lobby-wrapper .stats-pill-label {
+    font-size: 0.68rem;
+    color: #5c5470;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.game-lobby-wrapper .stats-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.05);
+    margin-bottom: 1.25rem;
+}
+
+.game-lobby-wrapper .stats-game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+
+.game-lobby-wrapper .stats-game-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #faf0e6;
+}
+
+.game-lobby-wrapper .stats-game-details {
+    display: flex;
+    gap: 12px;
+}
+
+.game-lobby-wrapper .stats-game-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.game-lobby-wrapper .stats-progress-container {
+    width: 100%;
+    height: 4px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.game-lobby-wrapper .stats-progress-bar {
+    height: 100%;
+    border-radius: 99px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+    .game-lobby-wrapper .home-container {
+        padding: 1rem;
+    }
+
+    .game-lobby-wrapper .home-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .game-lobby-wrapper .home-title {
+        font-size: 1.5rem;
+    }
+
+    .game-lobby-wrapper .home-subtitle {
+        font-size: 0.81rem;
+    }
+
+    .game-lobby-wrapper .status-badge {
+        align-self: flex-start;
+    }
+
+    .game-lobby-wrapper .games-grid {
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .game-lobby-wrapper .game-card {
+        padding: 1.2rem;
+    }
+
+    .game-lobby-wrapper .lb-card {
+        padding: 1.2rem;
+    }
+
+    .game-lobby-wrapper .lb-item {
+        gap: 0.5rem;
+        padding: 0.55rem 0.6rem;
+        font-size: 0.82rem;
+    }
+
+    .game-lobby-wrapper .lb-wins {
+        font-size: 0.75rem;
+    }
+
+    .game-lobby-wrapper .match-players {
+        font-size: 0.82rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 160px;
+    }
+
+    .game-lobby-wrapper .stats-game-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .game-lobby-wrapper .stats-game-details {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .game-lobby-wrapper .stats-pill-val {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-lobby-wrapper .home-container {
+        padding: 0.75rem;
+    }
+
+    .game-lobby-wrapper .home-title {
+        font-size: 1.3rem;
+    }
+
+    .game-lobby-wrapper .games-grid {
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .game-lobby-wrapper .game-card {
+        padding: 1rem;
+    }
+
+    .game-lobby-wrapper .game-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+    }
+
+    .game-lobby-wrapper .game-title {
+        font-size: 1rem;
+    }
+
+    .game-lobby-wrapper .lb-card {
+        padding: 1rem;
+        border-radius: 16px;
+    }
+
+    .game-lobby-wrapper .lb-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .game-lobby-wrapper .lb-switch-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
+    }
+
+    .game-lobby-wrapper .match-row {
+        gap: 8px;
+        padding: 8px 0;
+    }
+
+    .game-lobby-wrapper .match-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 15px;
+    }
+
+    .game-lobby-wrapper .match-players {
+        max-width: 120px;
+        font-size: 0.78rem;
+    }
+
+    .game-lobby-wrapper .match-winner {
+        font-size: 0.72rem;
+    }
+
+    .game-lobby-wrapper .stats-pills-grid {
+        gap: 6px;
+        margin-bottom: 1rem;
+    }
+
+    .game-lobby-wrapper .stats-pill {
+        padding: 8px 6px;
+        border-radius: 10px;
+    }
+
+    .game-lobby-wrapper .stats-pill-val {
+        font-size: 1rem;
+    }
+
+    .game-lobby-wrapper .stats-game-details {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+}

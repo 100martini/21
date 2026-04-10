@@ -1,0 +1,31 @@
+2026-02-02 10:13:54.770 GMT [38871] LOG:  starting PostgreSQL 17.4 on aarch64-apple-darwin20.0.0, compiled by clang version 14.0.6, 64-bit
+2026-02-02 10:13:54.772 GMT [38871] LOG:  listening on IPv6 address "::1", port 5432
+2026-02-02 10:13:54.772 GMT [38871] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2026-02-02 10:13:54.773 GMT [38871] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2026-02-02 10:13:54.776 GMT [38874] LOG:  database system was shut down at 2026-02-02 10:13:35 GMT
+2026-02-02 10:13:54.780 GMT [38871] LOG:  database system is ready to accept connections
+2026-02-02 10:14:07.450 GMT [39151] FATAL:  database "bimane" does not exist
+2026-02-02 10:15:54.900 GMT [39199] FATAL:  role "postgres" does not exist
+2026-02-02 10:18:54.777 GMT [38872] LOG:  checkpoint starting: time
+2026-02-02 10:18:59.255 GMT [38872] LOG:  checkpoint complete: wrote 47 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=4.469 s, sync=0.003 s, total=4.478 s; sync files=11, longest=0.001 s, average=0.001 s; distance=281 kB, estimate=281 kB; lsn=0/1548280, redo lsn=0/15481F0
+2026-02-02 10:23:49.492 GMT [39492] FATAL:  database "bimane" does not exist
+2026-02-02 10:23:54.743 GMT [39498] FATAL:  database "bimane" does not exist
+2026-02-02 10:24:14.129 GMT [39510] FATAL:  database "bimane" does not exist
+2026-02-02 10:26:17.478 GMT [39571] FATAL:  role "your_system_user" does not exist
+2026-02-02 10:26:28.473 GMT [39577] FATAL:  role "biman" does not exist
+2026-02-02 10:27:35.614 GMT [39603] ERROR:  database "chatdb" already exists
+2026-02-02 10:27:35.614 GMT [39603] STATEMENT:  CREATE DATABASE chatdb OWNER mon_user;
+2026-02-02 10:28:54.314 GMT [38872] LOG:  checkpoint starting: time
+2026-02-02 10:30:32.019 GMT [38872] LOG:  checkpoint complete: wrote 966 buffers (5.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=97.691 s, sync=0.010 s, total=97.706 s; sync files=331, longest=0.001 s, average=0.001 s; distance=4420 kB, estimate=4420 kB; lsn=0/1999478, redo lsn=0/19993E8
+2026-02-02 11:44:39.757 GMT [46431] ERROR:  database "chatdb" already exists
+2026-02-02 11:44:39.757 GMT [46431] STATEMENT:  CREATE DATABASE chatdb;
+2026-02-02 14:58:17.624 GMT [38872] LOG:  checkpoint starting: time
+2026-02-02 14:58:19.384 GMT [38872] LOG:  checkpoint complete: wrote 18 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.743 s, sync=0.001 s, total=1.762 s; sync files=13, longest=0.001 s, average=0.001 s; distance=16 kB, estimate=3980 kB; lsn=0/199D758, redo lsn=0/199D700
+2026-02-03 10:49:43.629 GMT [38872] LOG:  checkpoint starting: time
+2026-02-03 10:49:46.500 GMT [38872] LOG:  checkpoint complete: wrote 29 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.844 s, sync=0.003 s, total=2.872 s; sync files=20, longest=0.001 s, average=0.001 s; distance=1 kB, estimate=3582 kB; lsn=0/199DF50, redo lsn=0/199DEF8
+2026-02-03 10:54:43.500 GMT [38872] LOG:  checkpoint starting: time
+2026-02-03 10:54:46.356 GMT [38872] LOG:  checkpoint complete: wrote 29 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.846 s, sync=0.002 s, total=2.859 s; sync files=25, longest=0.001 s, average=0.001 s; distance=4 kB, estimate=3224 kB; lsn=0/199F198, redo lsn=0/199F140
+2026-02-03 10:59:43.352 GMT [38872] LOG:  checkpoint starting: time
+2026-02-03 10:59:45.195 GMT [38872] LOG:  checkpoint complete: wrote 19 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.833 s, sync=0.003 s, total=1.844 s; sync files=19, longest=0.001 s, average=0.001 s; distance=6 kB, estimate=2902 kB; lsn=0/19A0B78, redo lsn=0/19A0AE8
+2026-02-04 14:20:26.539 GMT [38872] LOG:  checkpoint starting: time
+2026-02-04 14:20:28.407 GMT [38872] LOG:  checkpoint complete: wrote 19 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.850 s, sync=0.004 s, total=1.870 s; sync files=19, longest=0.001 s, average=0.001 s; distance=4 kB, estimate=2612 kB; lsn=0/19A1ED0, redo lsn=0/19A1E78

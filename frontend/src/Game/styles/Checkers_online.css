@@ -1,0 +1,986 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+.checkers-online-wrapper {
+    --bg-deep: #1a1625;
+    --bg-card: #252030;
+    --bg-input: #352f44;
+    --bg-muted: #5c5470;
+    --border-subtle: rgba(185, 180, 199, 0.08);
+
+    --text-primary: #faf0e6;
+    --text-secondary: #b9b4c7;
+    --text-dim: #5c5470;
+
+    /* Board & Pieces */
+    --board-border: #B9B4C7;
+    --square-light: #FAF0E6;
+    --square-dark: #5C5470;
+    --square-valid: rgba(144, 190, 109, 0.6);
+
+    /* Accents */
+    --green-accent: #90be6d;
+    --green-dark: #7da55d;
+    --gold-highlight: #f9c74f;
+    --red-piece: #ef767a;
+
+    --radius-md: 12px;
+    --radius-lg: 20px;
+
+    margin: -32px;
+    height: calc(100vh);
+    overflow: hidden;
+    background-color: var(--bg-deep);
+    padding: 0.75rem 1.5rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.checkers-online-wrapper .container {
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+}
+
+.checkers-online-wrapper .container::-webkit-scrollbar {
+    display: none;
+}
+
+/* ===== HEADER ===== */
+.checkers-online-wrapper .header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.checkers-online-wrapper .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.checkers-online-wrapper .back-btn:hover {
+    color: var(--text-primary);
+}
+
+.checkers-online-wrapper .back-arrow {
+    font-size: 1.125rem;
+}
+
+.checkers-online-wrapper .title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.checkers-online-wrapper .subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0.2rem 0 0;
+}
+
+/* ===== CONNECTION STATUS ===== */
+.checkers-online-wrapper .connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.checkers-online-wrapper .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.checkers-online-wrapper .status-dot.connected {
+    background: var(--green-accent);
+}
+
+.checkers-online-wrapper .status-dot.disconnected {
+    background: var(--red-piece);
+}
+
+.checkers-online-wrapper .status-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* ===== CARD ===== */
+.checkers-online-wrapper .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 0.75rem 1.25rem;
+}
+
+.checkers-online-wrapper .card-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem;
+}
+
+/* ===== FORM FIELDS ===== */
+.checkers-online-wrapper .form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.checkers-online-wrapper .field-label {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.checkers-online-wrapper .field-input {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    outline: none;
+    transition: 0.2s;
+}
+
+.checkers-online-wrapper .field-input:focus {
+    border-color: var(--text-secondary);
+}
+
+.checkers-online-wrapper .field-input::placeholder {
+    color: var(--text-dim);
+}
+
+/* ===== BUTTONS ===== */
+.checkers-online-wrapper .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    transition: 0.2s;
+}
+
+.checkers-online-wrapper .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkers-online-wrapper .btn-primary {
+    background: var(--green-accent);
+    color: var(--bg-card);
+}
+
+.checkers-online-wrapper .btn-primary:hover:not(:disabled) {
+    background: var(--green-dark);
+}
+
+.checkers-online-wrapper .btn-secondary {
+    background: var(--bg-muted);
+    color: var(--text-primary);
+}
+
+.checkers-online-wrapper .btn-secondary:hover:not(:disabled) {
+    background: #6d6482;
+}
+
+.checkers-online-wrapper .button-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.checkers-online-wrapper .button-row .btn {
+    flex: 1;
+}
+
+/* ===== ROOMS LIST ===== */
+.checkers-online-wrapper .rooms-section {
+    margin-top: 2rem;
+}
+
+.checkers-online-wrapper .rooms-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.checkers-online-wrapper .rooms-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.checkers-online-wrapper .btn-refresh {
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: 0.2s;
+}
+
+.checkers-online-wrapper .btn-refresh:hover:not(:disabled) {
+    background: var(--bg-muted);
+    color: var(--text-primary);
+}
+
+.checkers-online-wrapper .btn-refresh:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkers-online-wrapper .btn-random {
+    background: rgba(249, 199, 79, 0.15);
+    border: 1px solid rgba(249, 199, 79, 0.4);
+    color: var(--gold-highlight);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.checkers-online-wrapper .btn-random:hover:not(:disabled) {
+    background: rgba(249, 199, 79, 0.28);
+    border-color: var(--gold-highlight);
+}
+
+.checkers-online-wrapper .btn-random:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== MATCHMAKING QUEUE BANNER ===== */
+.checkers-online-wrapper .queue-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(249, 199, 79, 0.08);
+    border: 1px solid rgba(249, 199, 79, 0.3);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.checkers-online-wrapper .queue-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(249, 199, 79, 0.25);
+    border-top-color: var(--gold-highlight);
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: ck-spin 0.9s linear infinite;
+}
+
+.checkers-online-wrapper .queue-text {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--gold-highlight);
+    margin: 0 0 0.2rem;
+}
+
+.checkers-online-wrapper .queue-sub {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.checkers-online-wrapper .btn-cancel-queue {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid rgba(239, 118, 122, 0.4);
+    color: #ef767a;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+
+.checkers-online-wrapper .btn-cancel-queue:hover {
+    background: rgba(239, 118, 122, 0.12);
+    border-color: #ef767a;
+}
+
+
+
+
+
+.checkers-online-wrapper .rooms-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.checkers-online-wrapper .room-item {
+    background: var(--bg-input);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.checkers-online-wrapper .room-info {
+    display: flex;
+    gap: 2rem;
+}
+
+.checkers-online-wrapper .room-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 0 0 0.25rem;
+}
+
+.checkers-online-wrapper .room-id {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.checkers-online-wrapper .room-creator,
+.checkers-online-wrapper .room-players {
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.checkers-online-wrapper .btn-join {
+    background: var(--green-accent);
+    color: var(--bg-card);
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.checkers-online-wrapper .btn-join:hover:not(:disabled) {
+    background: var(--green-dark);
+}
+
+.checkers-online-wrapper .btn-join:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkers-online-wrapper .rooms-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    background: var(--bg-input);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+}
+
+/* ===== GAME AREA ===== */
+.checkers-online-wrapper .game-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Room Info */
+.checkers-online-wrapper .room-info-card {
+    padding: 0.6rem 1rem;
+}
+
+.checkers-online-wrapper .room-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.checkers-online-wrapper .info-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 0 0 0.25rem;
+}
+
+.checkers-online-wrapper .room-id-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkers-online-wrapper .room-id-big {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.checkers-online-wrapper .btn-copy {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.125rem;
+    padding: 0.25rem;
+    transition: 0.2s;
+    opacity: 0.7;
+}
+
+.checkers-online-wrapper .btn-copy:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.checkers-online-wrapper .color-badge {
+    text-align: right;
+}
+
+.checkers-online-wrapper .color-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.checkers-online-wrapper .color-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+/* White pieces */
+.checkers-online-wrapper .color-circle.white {
+    background: radial-gradient(circle at 30% 30%, #fff, #e0e0e0);
+    border: 1px solid var(--board-border);
+}
+
+.checkers-online-wrapper .color-circle.black {
+    background: radial-gradient(circle at 30% 30%, #352f44, #1a1625);
+    border: 1px solid #5C5470;
+}
+
+.checkers-online-wrapper .color-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.checkers-online-wrapper .players-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.checkers-online-wrapper .player-box {
+    flex: 1;
+    background: var(--bg-input);
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
+}
+
+.checkers-online-wrapper .player-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 0 0 0.25rem;
+}
+
+.checkers-online-wrapper .player-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Status Bar */
+.checkers-online-wrapper .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+}
+
+.checkers-online-wrapper .turn-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--bg-muted);
+    transition: 0.3s;
+}
+
+.checkers-online-wrapper .turn-indicator.active {
+    background: var(--green-accent);
+    box-shadow: 0 0 8px var(--green-accent);
+}
+
+.checkers-online-wrapper .turn-text {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Winner Banner */
+.checkers-online-wrapper .winner-banner {
+    text-align: center;
+    padding: 0.6rem 1rem;
+}
+
+.checkers-online-wrapper .winner-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+}
+
+/* ===== BOARD ===== */
+.checkers-online-wrapper .board-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem;
+}
+
+.checkers-online-wrapper .board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    width: min(480px, 72vmin);
+    border: 4px solid var(--board-border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.checkers-online-wrapper .square {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: none;
+    padding: 0;
+    cursor: default;
+    transition: 0.15s;
+}
+
+.checkers-online-wrapper .square.dark {
+    background: var(--square-dark);
+}
+
+.checkers-online-wrapper .square.light {
+    background: var(--square-light);
+}
+
+.checkers-online-wrapper .square.selected {
+    outline: 3px solid var(--gold-highlight);
+    outline-offset: -3px;
+    z-index: 2;
+}
+
+.checkers-online-wrapper .square.valid-move {
+    background: var(--square-valid);
+    /* Changed from outline to background to match local */
+    cursor: pointer;
+}
+
+.checkers-online-wrapper .square.valid-move:hover {
+    filter: brightness(1.15);
+}
+
+.checkers-online-wrapper .square.clickable {
+    cursor: pointer;
+}
+
+.checkers-online-wrapper .square.clickable:hover {
+    filter: brightness(1.12);
+}
+
+/* Piece */
+.checkers-online-wrapper .piece {
+    width: 75%;
+    height: 75%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    transition: 0.15s;
+}
+
+.checkers-online-wrapper .square.clickable:hover .piece {
+    transform: scale(1.1);
+}
+
+/* White pieces */
+.checkers-online-wrapper .piece.white {
+    background: radial-gradient(circle at 30% 30%, #fff, #e0e0e0);
+    border: 2px solid var(--board-border);
+    color: var(--bg-deep);
+}
+
+.checkers-online-wrapper .piece.black {
+    background: radial-gradient(circle at 30% 30%, #352f44, #1a1625);
+    border: 2px solid #5C5470;
+    color: white;
+    /* For King icon */
+}
+
+.checkers-online-wrapper .piece.king::after {
+    content: '👑';
+}
+
+.checkers-online-wrapper .move-indicator {
+    position: absolute;
+    width: 35%;
+    height: 35%;
+    border-radius: 50%;
+    background: var(--green-accent);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.checkers-online-wrapper .board-hint {
+    margin-top: 1.25rem;
+    text-align: center;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .checkers-online-wrapper {
+        padding: 0.5rem 0.75rem;
+        margin: -24px;
+    }
+
+    .checkers-online-wrapper .title {
+        font-size: 1.2rem;
+    }
+
+    .checkers-online-wrapper .room-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .checkers-online-wrapper .card {
+        padding: 0.6rem 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkers-online-wrapper {
+        padding: 0.875rem;
+    }
+
+    .checkers-online-wrapper .header {
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .checkers-online-wrapper .title {
+        font-size: 1.2rem;
+    }
+
+    .checkers-online-wrapper .card {
+        padding: 1.125rem;
+    }
+
+    .checkers-online-wrapper .button-row {
+        flex-direction: column;
+    }
+
+    .checkers-online-wrapper .players-row {
+        gap: 0.625rem;
+    }
+
+    .checkers-online-wrapper .room-info {
+        gap: 0.75rem;
+    }
+
+    .checkers-online-wrapper .board-hint {
+        font-size: 0.75rem;
+    }
+}
+
+/* ===== NOTIFICATION TOAST ===== */
+.checkers-online-wrapper .notification-toast {
+    position: fixed;
+    top: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    animation: ck-slideDown 0.25s ease;
+    white-space: nowrap;
+}
+
+@keyframes ck-slideDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* ===== RECONNECTING OVERLAY ===== */
+.checkers-online-wrapper .reconnecting-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 22, 37, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 999;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.checkers-online-wrapper .reconnecting-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--bg-muted);
+    border-top-color: var(--green-accent);
+    border-radius: 50%;
+    animation: ck-spin 0.8s linear infinite;
+}
+
+@keyframes ck-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== RECONNECTING STATUS DOT ===== */
+.checkers-online-wrapper .status-dot.reconnecting {
+    background: var(--gold-highlight);
+    animation: ck-blink 1s ease-in-out infinite;
+}
+
+@keyframes ck-blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* ===== PAUSE BANNER ===== */
+.checkers-online-wrapper .pause-banner {
+    text-align: center;
+    padding: 1.25rem;
+    border: 1px solid rgba(249, 199, 79, 0.25);
+    background: rgba(249, 199, 79, 0.06);
+}
+
+.checkers-online-wrapper .pause-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+    color: var(--gold-highlight);
+}
+
+.checkers-online-wrapper .pause-subtext {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* ===== WINNER ACTIONS ===== */
+.checkers-online-wrapper .winner-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.checkers-online-wrapper .winner-actions .btn {
+    flex: 1;
+    max-width: 200px;
+}
+
+/* ===== LEAVE GAME BUTTON ===== */
+.checkers-online-wrapper .btn-leave {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(239, 118, 122, 0.35);
+    color: #ef767a;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 0.25rem;
+}
+
+.checkers-online-wrapper .btn-leave:hover {
+    background: rgba(239, 118, 122, 0.12);
+    border-color: #ef767a;
+}
+
+/* ===== SPECTATOR BADGE ===== */
+.checkers-online-wrapper .spectator-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    border-radius: var(--radius-md);
+    padding: 0.6rem 1.1rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #a78bfa;
+    animation: ck-fadeIn 0.3s ease;
+}
+
+.checkers-online-wrapper .spectator-eye {
+    font-size: 1.1rem;
+}
+
+.checkers-online-wrapper .spectator-count {
+    margin-left: auto;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: rgba(167, 139, 250, 0.7);
+}
+
+@keyframes ck-fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== WATCH BUTTON ===== */
+.checkers-online-wrapper .btn-watch {
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.45);
+    color: #818cf8;
+    min-width: 110px;
+    height: 36px;
+    padding: 0 0.9rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkers-online-wrapper .btn-watch:hover:not(:disabled) {
+    background: rgba(99, 102, 241, 0.28);
+    border-color: #818cf8;
+    color: #c7d2fe;
+}
+
+.checkers-online-wrapper .btn-watch:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== ROOM ACTIONS (Join / Watch side by side) ===== */
+.checkers-online-wrapper .room-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* ===== IN-PROGRESS STATUS BADGE ===== */
+.checkers-online-wrapper .room-status-playing {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gold-highlight);
+    background: rgba(249, 199, 79, 0.1);
+    border: 1px solid rgba(249, 199, 79, 0.3);
+    border-radius: 6px;
+    min-width: 110px;
+    height: 36px;
+    white-space: nowrap;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== PAUSED STATUS BADGE ===== */
+.checkers-online-wrapper .room-status-paused {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    min-width: 110px;
+    height: 36px;
+    white-space: nowrap;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== SPECTATOR COUNT PILL (in game area) ===== */
+.checkers-online-wrapper .spectator-pill {
+    flex: 0 0 auto;
+    min-width: 90px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+}

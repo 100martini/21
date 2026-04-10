@@ -1,0 +1,214 @@
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "8443:443"
+      - "8080:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - transcendence-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && npm run dev"
+    volumes:
+      - backend_node_modules:/app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - transcendence-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_CHECKERS_SOCKET_URL=http://${HOST_IP:-localhost}:3001
+      - VITE_TICTAC_SOCKET_URL=http://${HOST_IP:-localhost}:3002
+    volumes:
+      - frontend_node_modules:/app/node_modules
+    depends_on:
+      - backend
+      - checker-server
+      - tictac-server
+    networks:
+      - transcendence-net
+
+  checker-server:
+    build:
+      context: ./CheckerServer
+      dockerfile: Dockerfile
+    container_name: checker_server
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://games_user:games_pass@games_db:5432/games_db?schema=public
+      - PORT=3001
+    volumes:
+      - checker_node_modules:/app/node_modules
+    depends_on:
+      games_db:
+        condition: service_healthy
+    networks:
+      - transcendence-net
+
+  tictac-server:
+    build:
+      context: ./TictacServer
+      dockerfile: Dockerfile
+    container_name: tictac_server
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - DATABASE_URL=postgresql://games_user:games_pass@games_db:5432/games_db?schema=public
+      - PORT=3002
+    volumes:
+      - tictac_node_modules:/app/node_modules
+    depends_on:
+      games_db:
+        condition: service_healthy
+    networks:
+      - transcendence-net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=trandenden
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - transcendence-net
+
+  games_db:
+    image: postgres:16-alpine
+    container_name: games_db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=games_user
+      - POSTGRES_PASSWORD=games_pass
+      - POSTGRES_DB=games_db
+    volumes:
+      - games_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U games_user -d games_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - transcendence-net
+
+  chat-postgres:
+    image: postgres:16-alpine
+    container_name: chat-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=chatdb
+    ports:
+      - "5434:5432"           
+    volumes:
+      - chat_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d chatdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - transcendence-net
+
+  chat-redis:
+    image: redis:7-alpine
+    container_name: chat-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    networks:
+      - transcendence-net
+
+  chat-backend:
+    build:
+      context: ./chat/chat_back
+      dockerfile: Dockerfile
+    container_name: chat-backend
+    restart: unless-stopped
+    env_file:
+      - ./chat/chat_back/.env
+    environment:
+      - DATABASE_URL=${CHAT_DATABASE_URL:-postgresql+asyncpg://postgres:postgres@chat-postgres:5432/chatdb}
+      - REDIS_URL=${CHAT_REDIS_URL:-redis://chat-redis:6379/0}
+      - MAIN_DATABASE_URL=${MAIN_DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/trandenden}
+    ports:
+      - "8000:8000"
+    depends_on:
+      chat-postgres:
+        condition: service_healthy
+      chat-redis:
+        condition: service_started
+    networks:
+      - transcendence-net
+
+  chat-frontend:
+    build:
+      context: ./chat/chat-front
+      dockerfile: Dockerfile
+    container_name: chat-frontend
+    restart: unless-stopped
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000}
+    ports:
+      - "5176:5173"
+    volumes:
+      - chat_frontend_node_modules:/app/node_modules
+    depends_on:
+      - chat-backend
+    networks:
+      - transcendence-net
+
+networks:
+  transcendence-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  games_data:
+  chat_postgres_data:              
+  chat_frontend_node_modules:     
+  frontend_node_modules:
+  backend_node_modules:
+  checker_node_modules:
+  tictac_node_modules:

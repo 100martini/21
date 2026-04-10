@@ -1,0 +1,235 @@
+:root {
+    --bg-dark: #1a1625;
+    --bg-card: #252030;
+    --bg-input: #352f44;
+    --text-main: #faf0e6;
+    --text-dim: #b9b4c7;
+    --accent-x: #90be6d;
+    --accent-o: #f9c74f;
+    --transition: all 0.3s ease;
+}
+
+.tictac-local-wrapper .game-container {
+    min-height: 100vh;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    padding: 20px;
+    font-family: sans-serif;
+}
+
+.tictac-local-wrapper .game-wrapper {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.tictac-local-wrapper .game-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.tictac-local-wrapper .game-header h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.tictac-local-wrapper .game-header p {
+    color: var(--text-dim);
+    margin-top: 5px;
+}
+
+/* Cards */
+.tictac-local-wrapper .card {
+    background: var(--bg-card);
+    border: 1px solid rgba(185, 180, 199, 0.1);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.tictac-local-wrapper .setup-card {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 40px;
+}
+
+.tictac-local-wrapper .setup-card h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+.tictac-local-wrapper .setup-card .btn-primary {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    padding: 16px;
+}
+
+/* Setup Screen */
+.tictac-local-wrapper .input-group {
+    margin-bottom: 15px;
+}
+
+.tictac-local-wrapper .input-group label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+}
+
+.tictac-local-wrapper .input-group input {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    background: var(--bg-input);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: white;
+    outline: none;
+}
+
+/* Grid Board */
+.tictac-local-wrapper .board-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+.tictac-local-wrapper .cell {
+    aspect-ratio: 1 / 1;
+    background: var(--bg-input);
+    border: none;
+    border-radius: 12px;
+    font-size: 2.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tictac-local-wrapper .cell:hover:not(:disabled) {
+    background: #453d5a;
+}
+
+.tictac-local-wrapper .cell.x-color {
+    color: var(--accent-x);
+}
+
+.tictac-local-wrapper .cell.o-color {
+    color: var(--accent-o);
+}
+
+/* Status & Buttons */
+.tictac-local-wrapper .player-stats {
+    display: flex;
+    gap: 15px;
+}
+
+.tictac-local-wrapper .player-box {
+    flex: 1;
+    padding: 15px;
+    border-radius: 12px;
+    background: var(--bg-input);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid transparent;
+    transition: var(--transition);
+}
+
+.tictac-local-wrapper .active-x {
+    border-color: var(--accent-x);
+    background: rgba(144, 190, 109, 0.1);
+}
+
+.tictac-local-wrapper .active-o {
+    border-color: var(--accent-o);
+    background: rgba(249, 199, 79, 0.1);
+}
+
+.tictac-local-wrapper .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tictac-local-wrapper .btn-primary {
+    background: var(--accent-x);
+    color: var(--bg-dark);
+}
+
+.tictac-local-wrapper .btn-secondary {
+    background: var(--bg-input);
+    color: white;
+    margin-top: 10px;
+}
+
+.tictac-local-wrapper .winner-card {
+    text-align: center;
+    background: rgba(144, 190, 109, 0.1);
+    border-color: var(--accent-x);
+}
+
+.tictac-local-wrapper .winner-card h3 {
+    font-size: 1.5rem;
+    color: var(--text-main);
+    margin-bottom: 20px;
+}
+
+.tictac-local-wrapper .btn-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.tictac-local-wrapper .btn-group .btn {
+    flex: 1;
+    margin: 0;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Back Button */
+.tictac-local-wrapper .back-button-container {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.tictac-local-wrapper .back-button {
+    display: inline-block;
+    color: #b9b4c7;
+    font-size: 14px;
+    transition: color 0.3s ease;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+}
+
+.tictac-local-wrapper .back-button:hover {
+    color: #faf0e6;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 400px) {
+    .tictac-local-wrapper .board-grid {
+        gap: 8px;
+    }
+
+    .tictac-local-wrapper .cell {
+        font-size: 2rem;
+    }
+
+    .tictac-local-wrapper .card {
+        padding: 15px;
+    }
+}
