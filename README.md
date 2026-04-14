@@ -1,6 +1,6 @@
 # 21 - project hub 🃏
 
-> a real-time collaboration platform for 42 students. login with your intra, chat with your team, manage tasks — and when you need a break, there's a game area .
+> a real-time collaboration platform for 42 students. login with your intra, chat with your team, manage tasks — and when you need a break, there's a game area waiting.
 
 ---
 
