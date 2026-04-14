@@ -62,8 +62,8 @@ fclean:
 	@echo "$(RED)Removing containers, volumes, images and build artifacts$(NC)"
 	@docker compose down -v --rmi all
 	@docker system prune -af
-	@rm -rf frontend/node_modules frontend/dist
-	@rm -rf backend/node_modules
+	@rm -rf src/frontend/node_modules src/frontend/dist
+	@rm -rf src/backend/node_modules
 	@echo "$(GREEN)Full cleanup complete.$(NC)"
 
 .DEFAULT_GOAL := help

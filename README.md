@@ -74,12 +74,17 @@ then open `https://localhost`
 ```
 .
 ├── docker-compose.yml
-├── nginx/
-├── frontend/          ← react + typescript
-├── backend/           ← express.js + prisma
-├── chat-backend/      ← fastapi
-├── tictac-server/     ← tic-tac-toe
-└── checker-server/    ← checkers + matchmaking
+├── Makefile
+├── README.md
+└── src/
+    ├── nginx/
+    ├── frontend/          ← react + typescript
+    ├── backend/           ← express.js + prisma
+    ├── chat/
+    │   ├── chat_back/     ← fastapi
+    │   └── chat-front/    ← chat frontend
+    ├── TictacServer/     ← tic-tac-toe
+    └── CheckerServer/    ← checkers + matchmaking
 ```
 
 ---

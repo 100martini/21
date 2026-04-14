@@ -1,7 +1,7 @@
 services:
   nginx:
     build:
-      context: ./nginx
+      context: ./src/nginx
       dockerfile: Dockerfile
     container_name: nginx
     restart: unless-stopped
@@ -16,14 +16,14 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: ./src/backend
       dockerfile: Dockerfile
     container_name: backend
     restart: unless-stopped
     ports:
       - "3000:3000"
     env_file:
-      - ./backend/.env
+      - ./src/backend/.env
     command: sh -c "npx prisma migrate deploy && npx prisma db seed && npm run dev"
     volumes:
       - backend_node_modules:/app/node_modules
@@ -35,7 +35,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ./src/frontend
       dockerfile: Dockerfile
     container_name: frontend
     restart: unless-stopped
@@ -55,7 +55,7 @@ services:
 
   checker-server:
     build:
-      context: ./CheckerServer
+      context: ./src/CheckerServer
       dockerfile: Dockerfile
     container_name: checker_server
     restart: unless-stopped
@@ -74,7 +74,7 @@ services:
 
   tictac-server:
     build:
-      context: ./TictacServer
+      context: ./src/TictacServer
       dockerfile: Dockerfile
     container_name: tictac_server
     restart: unless-stopped
@@ -162,12 +162,12 @@ services:
 
   chat-backend:
     build:
-      context: ./chat/chat_back
+      context: ./src/chat/chat_back
       dockerfile: Dockerfile
     container_name: chat-backend
     restart: unless-stopped
     env_file:
-      - ./chat/chat_back/.env
+      - ./src/chat/chat_back/.env
     environment:
       - DATABASE_URL=${CHAT_DATABASE_URL:-postgresql+asyncpg://postgres:postgres@chat-postgres:5432/chatdb}
       - REDIS_URL=${CHAT_REDIS_URL:-redis://chat-redis:6379/0}
@@ -184,7 +184,7 @@ services:
 
   chat-frontend:
     build:
-      context: ./chat/chat-front
+      context: ./src/chat/chat-front
       dockerfile: Dockerfile
     container_name: chat-frontend
     restart: unless-stopped
